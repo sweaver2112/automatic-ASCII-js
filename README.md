@@ -1,8 +1,6 @@
 # uhhhASCII
-# sweaver2112 2020
 
 Automatic ASCII Art
-
 Automatic Image to Text
 
 A small utility written in JavaScript that converts images to ASCII.
