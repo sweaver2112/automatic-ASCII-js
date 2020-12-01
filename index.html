@@ -1,178 +1,172 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
-<head>
+  <head>
 
-  <meta charset="UTF-8">
-  
-<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.sfo2.cdn.digitaloceanspaces.com/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
-<meta name="apple-mobile-web-app-title" content="CodePen">
+    <meta charset="UTF-8">
+    <title>Scott Weaver - Automatic ASCII (image to text)</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
 
-<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.sfo2.cdn.digitaloceanspaces.com/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+    <style>
+      body {
+        font-family: 'Source Code Pro';
+        text-align: center;
+      }
 
-<link rel="mask-icon" type="" href="https://cpwebassets.sfo2.cdn.digitaloceanspaces.com/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+      body.dark {
+        color: white;
+        background-color: black;
+      }
+
+      #darkMode {
+        position: fixed;
+        right: 0;
+        top: 0;
+        padding: 5px;
+      }
+
+      #darkMode:hover {
+        cursor: pointer;
+      }
+
+      #grid {
+        whitespace: pre;
+      }
+
+      .container {
+        padding: 3px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+        padding: 0px;
+      }
+
+      .instructions {
+        display: inline;
+        font-size: 75%;
+        font-style: italic;
+      }
+    </style>
+  </head>
+
+  <body translate="no">
+    <div title="toggle Dark mode" id="darkMode">🌛️</div>
+    <div id="controls">
+      <div style="text-align:center">
+        <h1>Automatic ASCII</h1>
+      </div>
+      <input type="file" name="image" id="image">
+
+      <div class="container"><label for="pSize">Pixel Size to analyze:</label><input type="number" step="1" min="1"
+          max="40" value="5" id="pSize">
+      </div>
+
+      <div class="container">
+        <label for="scale">Output font size (px):</label><input type="number" min="1" max="20" value="5" id="scale">
+      </div>
+
+      <div class="container">
+        <label for="inputString">Map (dark to light):</label>
+        <input id="inputString" type="text" value=" _0123456789&%$@#~" /><button id="shuffle">Shuffle</button>
+      </div>
+
+    </div>
+
+    <div id="grid"></div>
 
 
-  <title>CodePen - Automatic ASCII (image to text)</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
-  
-  
-  
-<style>
-body {
-  font-family: 'Source Code Pro';
-  text-align:center;
-}
-body.dark {
-  color:white;
-  background-color:black;
-}
-#darkMode {
-  position:fixed;
-  right:0;
-  top:0;
-  padding:5px;
-}
-#darkMode:hover {
-  cursor:pointer;
-}
-#grid {
- whitespace:pre;
-}
-.container {
-  padding:3px;
-}
-h1 {
-  font-size:1.5em;
-  padding:0px;
-}
-.instructions {
-  display:inline;
-  font-size:75%;
-  font-style:italic; 
-}
-</style>
+    <script id="rendered-js">
+      let body = document.querySelector("body");
+      let myURL = "https://assets.codepen.io/1197275/worldMapTurq.svg";
+      var hidden = document.createElement('canvas');
+      var hiddenX = hidden.getContext('2d');
 
-  
-  
-  
-  
+      shuffle.onclick = () => {
+        inputString.value = [...inputString.value].sort(() => Math.random() - .5).join("")
+        main()
+      }
+      darkMode.onclick = (ev) => {
+        if (body.classList.contains('dark')) {
+          body.classList.remove("dark")
+          ev.target.innerText = "🌛️"
+        } else {
+          ev.target.innerText = "🌞️"
+          body.classList.add("dark")
+        }
+      }
+      inputString.onchange = main
+      scale.onchange = main
+      pSize.onchange = main
+      image.addEventListener('change', main)
+      var img
+      main()
 
-</head>
+      function main(ev) {
 
-<body translate="no" >
-  <div title="toggle Dark mode" id="darkMode">🌛️</div>
-<div id="controls">
-  <div style="text-align:center">
-    <h1>Automatic ASCII</h1>
-  </div>
-  <input type="file" name="image" id="image">
+        if (!img || image.files[0] != img.src) {
+          var img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.onload = function () {
+            hidden.width = img.naturalWidth
+            hidden.height = img.naturalHeight
+            hidden.getContext('2d').clearRect(0, 0, hidden.width, hidden.height)
+            hiddenX.drawImage(img, 0, 0);
+            buildGrid(img);
+          }
+          img.src = image.files[0] ? URL.createObjectURL(image.files[0]) : myURL;
+        } else {
+          buildGrid(img)
+        }
 
-  <div class="container"><label for="pSize">Pixel Size to analyze:</label><input type="number" step="1" min="1" max="40" value="5" id="pSize">
-  </div>
-  
-  <div class="container">
-    <label for="scale">Output font size (px):</label><input type="number" min="1"  max="20" value="5" id="scale">
-  </div> 
-  
-  <div class="container">
-    <label for="inputString">Map (dark to light):</label>
-    <input id="inputString" type="text" value=" _0123456789&%$@#~"/><button id="shuffle">Shuffle</button>
-  </div>
+      } //end main
 
-</div>
+      function buildGrid(img) {
 
-<div id="grid"></div>
-  
-  
-      <script id="rendered-js" >
-let body = document.querySelector("body");
-let myURL = "https://assets.codepen.io/1197275/worldMapTurq.svg";
-var hidden = document.createElement('canvas');
-var hiddenX = hidden.getContext('2d');
+        const ROWS = Math.floor(img.naturalHeight / pSize.value);
+        const COLS = Math.floor(img.naturalWidth / pSize.value);
 
-shuffle.onclick = ()=>{
-  inputString.value = [...inputString.value].sort(()=>Math.random()-.5).join("")
-  main()
-}
-darkMode.onclick = (ev) => {
-  if(body.classList.contains('dark')) {    
-    body.classList.remove("dark")
-    ev.target.innerText = "🌛️"https://codepen.io/sweaver2112
-  } else {
-    ev.target.innerText = "🌞️"
-    body.classList.add("dark")
-  }
-}
-inputString.onchange = main
-scale.onchange = main
-pSize.onchange = main
-image.addEventListener('change', main)
-var img
-main()
+        grid.innerHTML = ""
+        grid.style.fontSize = Math.floor(parseInt(scale.value)) + "px"
 
-function main(ev) { 
-  
-  if(!img || image.files[0] != img.src) { 
-    var img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.onload = function () {
-      hidden.width = img.naturalWidth
-      hidden.height = img.naturalHeight
-      hidden.getContext('2d').clearRect(0,0,hidden.width,hidden.height)
-      hiddenX.drawImage(img, 0, 0);    
-      buildGrid(img);
-     }
-    img.src = image.files[0] ? URL.createObjectURL(image.files[0]) : myURL;
-  } else {
-    buildGrid(img)
-  }
-  
-}//end main
+        let rez = ""
+        /* the " " which we putting in below is not the regular space it's the 'braille invisible char', U+2800 */
+        let map = inputString.value.replace(/\s/g, "⠀")
+        for (let i = 0; i < ROWS * COLS; i++) {
 
-function buildGrid(img) {  
+          let row = Math.floor(i / COLS);
+          let col = i % COLS;
+          let buffer = hiddenX.getImageData(col * pSize.value, row * pSize.value, pSize.value, pSize.value);
 
-  const ROWS = Math.floor(img.naturalHeight / pSize.value);
-  const COLS = Math.floor(img.naturalWidth / pSize.value);
+          let blockSize = 4
+          let rgb = {
+            "r": 0,
+            "g": 0,
+            "b": 0
+          };
+          let count = 0;
+          let j = -4;
+          while ((j += (blockSize)) < buffer.data.length) {
+            ++count;
+            rgb.r += buffer.data[j];
+            rgb.g += buffer.data[j + 1];
+            rgb.b += buffer.data[j + 2];
+          }
 
-  grid.innerHTML = ""
-  grid.style.fontSize = Math.floor(parseInt(scale.value))+"px"
+          let aveBright = (rgb.r / count + rgb.g / count + rgb.b / count) / 3;
+          let symbol = map[Math.floor(map.length * (aveBright / 256))];
+          rez += symbol
 
-  let rez = ""
-  /* the " " which we putting in below is not the regular space it's the 'braille invisible char', U+2800 */
-  let map = inputString.value.replace(/\s/g, "⠀")
-  for (let i = 0; i < ROWS * COLS; i++) {
+        } //end for each pixel
 
-    let row = Math.floor(i / COLS);
-    let col = i % COLS;
-    let buffer = hiddenX.getImageData(col * pSize.value, row * pSize.value, pSize.value, pSize.value);
+        let reg = new RegExp(`.{${COLS}}`, "g");
+        let withNewlines = rez.replace(reg, "$&\n");
+        grid.innerText = withNewlines
 
-    let blockSize = 4
-    let rgb = { "r": 0, "g": 0, "b": 0 };
-    let count = 0;let j = -4;
-    while ((j += (blockSize)) < buffer.data.length) {
-      ++count;
-      rgb.r += buffer.data[j];
-      rgb.g += buffer.data[j + 1];
-      rgb.b += buffer.data[j + 2];
-    }
-
-    let aveBright = (rgb.r / count + rgb.g / count + rgb.b / count) / 3;
-    let symbol = map[Math.floor(map.length*(aveBright/256))];  
-    rez += symbol
-
-  }//end for each pixel
-  
-  let reg = new RegExp(`.{${COLS}}`, "g");
-  let withNewlines = rez.replace(reg,"$&\n");
-  grid.innerText = withNewlines
-  
-}//end buildGrid
+      } //end buildGrid
     </script>
 
-  
-
-</body>
+  </body>
 
 </html>
