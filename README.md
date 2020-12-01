@@ -1,4 +1,4 @@
-#autoMatic ASCII in JavaScript
+# autoMatic ASCII in JavaScript
 
 A small utility written in JavaScript that converts images to ASCII.
 
