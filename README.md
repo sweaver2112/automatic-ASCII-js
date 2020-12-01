@@ -1,6 +1,4 @@
-# autoMatic ASCII in JavaScript
-
-A small utility written in JavaScript that converts images to ASCII.
+# Automatic Image conversion to ASCII with JavaScript
 
 No dependencies other than a Google font.  (use any monospace font)
 
