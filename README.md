@@ -1,2 +1,3 @@
 # uhhhASCII
-ASCII art
+
+Automatic ASCII Art
