@@ -1,12 +1,19 @@
-
 <!DOCTYPE html>
 <html lang="en" >
 
 <head>
 
   <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.sfo2.cdn.digitaloceanspaces.com/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
 
-  <title>Automatic ASCII (image to text)</title>
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.sfo2.cdn.digitaloceanspaces.com/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://cpwebassets.sfo2.cdn.digitaloceanspaces.com/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - Automatic ASCII (image to text)</title>
   <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
   
@@ -32,7 +39,6 @@ body.dark {
 }
 #grid {
  whitespace:pre;
- font-weight:normal;
 }
 .container {
   padding:3px;
@@ -72,13 +78,12 @@ h1 {
   
   <div class="container">
     <label for="inputString">Map (dark to light):</label>
-    <input id="inputString" type="text" value="_0123456789&%$@#"/><button id="shuffle">Shuffle</button>
+    <input id="inputString" type="text" value=" _0123456789&%$@#~"/><button id="shuffle">Shuffle</button>
   </div>
 
 </div>
 
 <div id="grid"></div>
-  
   
   
       <script id="rendered-js" >
@@ -94,7 +99,7 @@ shuffle.onclick = ()=>{
 darkMode.onclick = (ev) => {
   if(body.classList.contains('dark')) {    
     body.classList.remove("dark")
-    ev.target.innerText = "🌛️"
+    ev.target.innerText = "🌛️"https://codepen.io/sweaver2112
   } else {
     ev.target.innerText = "🌞️"
     body.classList.add("dark")
@@ -135,7 +140,8 @@ function buildGrid(img) {
   grid.style.fontSize = Math.floor(parseInt(scale.value))+"px"
 
   let rez = ""
-  let map = inputString.value
+  /* the " " which we putting in below is not the regular space it's the 'braille invisible char', U+2800 */
+  let map = inputString.value.replace(/\s/g, "⠀")
   for (let i = 0; i < ROWS * COLS; i++) {
 
     let row = Math.floor(i / COLS);
@@ -170,4 +176,3 @@ function buildGrid(img) {
 </body>
 
 </html>
- 
