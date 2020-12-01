@@ -1,7 +1,4 @@
-# uhhhASCII
-
-Automatic ASCII Art
-Automatic Image to Text
+#autoMatic ASCII in JavaScript
 
 A small utility written in JavaScript that converts images to ASCII.
 
