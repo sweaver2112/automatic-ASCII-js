@@ -1,172 +1,164 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 
-  <head>
+<head>
 
-    <meta charset="UTF-8">
-    <title>Scott Weaver - Automatic ASCII (image to text)</title>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Scott Weaver - Automatic ASCII (image to text)</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    
+  
+<style>
+body {
+  font-family: Consolas;
+  text-align:center;
+}
+body.dark {
+  color:white;
+  background-color:black;
+}
+#darkMode {
+  position:fixed;
+  right:0;
+  top:0;
+  padding:5px;
+}
+#darkMode:hover {
+  cursor:pointer;
+}
+#grid {
+ white-space:pre;
+}
+.container {
+  padding:3px;
+}
+h1 {
+  font-size:1.5em;
+  padding:0px;
+}
+.instructions {
+  display:inline;
+  font-size:75%;
+  font-style:italic; 
+}
+</style>
 
-    <style>
-      body {
-        font-family: 'Source Code Pro';
-        text-align: center;
-      }
+</head>
 
-      body.dark {
-        color: white;
-        background-color: black;
-      }
+<body translate="no" >
+  <div title="toggle Dark mode" id="darkMode">🌛️</div>
+<div id="controls">
+  <div style="text-align:center">
+    <h1>Automatic ASCII</h1>
+  </div>
+  <input type="file" name="image" id="image">
 
-      #darkMode {
-        position: fixed;
-        right: 0;
-        top: 0;
-        padding: 5px;
-      }
+  <div class="container"><label for="pSize">Pixel Size to analyze:</label><input type="number" step="1" min="1" max="40" value="5" id="pSize">
+  </div>
+  
+  <div class="container">
+    <label for="scale">Output font size (px):</label><input type="number" min="1"  max="20" value="5" id="scale">
+  </div> 
+  
+  <div class="container">
+    <label for="inputString">Map (dark to light):</label>
+    <input id="inputString" type="text" value=" _0123456789&%$@#~"/><button id="shuffle">Shuffle</button>
+    <a id="help" title="See Pen Details for Usage Instructions" title="See Pen Details for Usage Instructions" target="_blank" href="https://codepen.io/sweaver2112/details/BaLyXmR">?</a>
+  </div>
 
-      #darkMode:hover {
-        cursor: pointer;
-      }
+</div>
 
-      #grid {
-        whitespace: pre;
-      }
+<div id="grid"></div>
+  
+  
+      <script id="rendered-js" >
+let body = document.querySelector("body");
+let myURL = "https://assets.codepen.io/1197275/worldMapTurq.svg";
+var hidden = document.createElement('canvas');
+var hiddenX = hidden.getContext('2d');
 
-      .container {
-        padding: 3px;
-      }
+shuffle.onclick = ()=>{
+  inputString.value = [...inputString.value].sort(()=>Math.random()-.5).join("")
+  main()
+}
+darkMode.onclick = (ev) => {
+  if(body.classList.contains('dark')) {    
+    body.classList.remove("dark")
+    ev.target.innerText = "🌛️"
+  } else {
+    ev.target.innerText = "🌞️"
+    body.classList.add("dark")
+  }
+}
+inputString.onchange = main
+scale.onchange = main
+pSize.onchange = main
+image.addEventListener('change', main)
+var img
+main()
 
-      h1 {
-        font-size: 1.5em;
-        padding: 0px;
-      }
+function main(ev) { 
+  
+  if(!img || image.files[0] != img.src) { 
+    var img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = function () {
+      hidden.width = img.naturalWidth
+      hidden.height = img.naturalHeight
+      hidden.getContext('2d').clearRect(0,0,hidden.width,hidden.height)
+      hiddenX.drawImage(img, 0, 0);    
+      buildGrid(img);
+     }
+    img.src = image.files[0] ? URL.createObjectURL(image.files[0]) : myURL;
+  } else {
+    buildGrid(img)
+  }
+  
+}//end main
 
-      .instructions {
-        display: inline;
-        font-size: 75%;
-        font-style: italic;
-      }
-    </style>
-  </head>
+function buildGrid(img) {  
 
-  <body translate="no">
-    <div title="toggle Dark mode" id="darkMode">🌛️</div>
-    <div id="controls">
-      <div style="text-align:center">
-        <h1>Automatic ASCII</h1>
-      </div>
-      <input type="file" name="image" id="image">
+  const ROWS = Math.floor(img.naturalHeight / pSize.value);
+  const COLS = Math.floor(img.naturalWidth / pSize.value);
 
-      <div class="container"><label for="pSize">Pixel Size to analyze:</label><input type="number" step="1" min="1"
-          max="40" value="5" id="pSize">
-      </div>
+  grid.innerHTML = ""
+  grid.style.fontSize = Math.floor(parseInt(scale.value))+"px"
 
-      <div class="container">
-        <label for="scale">Output font size (px):</label><input type="number" min="1" max="20" value="5" id="scale">
-      </div>
+  let rez = ""
+  let map = inputString.value;
+  for (let i = 0; i < ROWS * COLS; i++) {
 
-      <div class="container">
-        <label for="inputString">Map (dark to light):</label>
-        <input id="inputString" type="text" value=" _0123456789&%$@#~" /><button id="shuffle">Shuffle</button>
-      </div>
+    let row = Math.floor(i / COLS);
+    let col = i % COLS;
+    let buffer = hiddenX.getImageData(col * pSize.value, row * pSize.value, pSize.value, pSize.value);
 
-    </div>
+    let blockSize = 4
+    let rgb = { "r": 0, "g": 0, "b": 0 };
+    let count = 0;let j = -4;
+    while ((j += (blockSize)) < buffer.data.length) {
+      ++count;
+      rgb.r += buffer.data[j];
+      rgb.g += buffer.data[j + 1];
+      rgb.b += buffer.data[j + 2];
+    }
 
-    <div id="grid"></div>
+    let aveBright = (rgb.r / count + rgb.g / count + rgb.b / count) / 3;
+    let symbol = map[Math.floor(map.length*(aveBright/256))];  
+    rez += symbol
 
-
-    <script id="rendered-js">
-      let body = document.querySelector("body");
-      let myURL = "https://assets.codepen.io/1197275/worldMapTurq.svg";
-      var hidden = document.createElement('canvas');
-      var hiddenX = hidden.getContext('2d');
-
-      shuffle.onclick = () => {
-        inputString.value = [...inputString.value].sort(() => Math.random() - .5).join("")
-        main()
-      }
-      darkMode.onclick = (ev) => {
-        if (body.classList.contains('dark')) {
-          body.classList.remove("dark")
-          ev.target.innerText = "🌛️"
-        } else {
-          ev.target.innerText = "🌞️"
-          body.classList.add("dark")
-        }
-      }
-      inputString.onchange = main
-      scale.onchange = main
-      pSize.onchange = main
-      image.addEventListener('change', main)
-      var img
-      main()
-
-      function main(ev) {
-
-        if (!img || image.files[0] != img.src) {
-          var img = new Image();
-          img.crossOrigin = "Anonymous";
-          img.onload = function () {
-            hidden.width = img.naturalWidth
-            hidden.height = img.naturalHeight
-            hidden.getContext('2d').clearRect(0, 0, hidden.width, hidden.height)
-            hiddenX.drawImage(img, 0, 0);
-            buildGrid(img);
-          }
-          img.src = image.files[0] ? URL.createObjectURL(image.files[0]) : myURL;
-        } else {
-          buildGrid(img)
-        }
-
-      } //end main
-
-      function buildGrid(img) {
-
-        const ROWS = Math.floor(img.naturalHeight / pSize.value);
-        const COLS = Math.floor(img.naturalWidth / pSize.value);
-
-        grid.innerHTML = ""
-        grid.style.fontSize = Math.floor(parseInt(scale.value)) + "px"
-
-        let rez = ""
-        /* the " " which we putting in below is not the regular space it's the 'braille invisible char', U+2800 */
-        let map = inputString.value.replace(/\s/g, "⠀")
-        for (let i = 0; i < ROWS * COLS; i++) {
-
-          let row = Math.floor(i / COLS);
-          let col = i % COLS;
-          let buffer = hiddenX.getImageData(col * pSize.value, row * pSize.value, pSize.value, pSize.value);
-
-          let blockSize = 4
-          let rgb = {
-            "r": 0,
-            "g": 0,
-            "b": 0
-          };
-          let count = 0;
-          let j = -4;
-          while ((j += (blockSize)) < buffer.data.length) {
-            ++count;
-            rgb.r += buffer.data[j];
-            rgb.g += buffer.data[j + 1];
-            rgb.b += buffer.data[j + 2];
-          }
-
-          let aveBright = (rgb.r / count + rgb.g / count + rgb.b / count) / 3;
-          let symbol = map[Math.floor(map.length * (aveBright / 256))];
-          rez += symbol
-
-        } //end for each pixel
-
-        let reg = new RegExp(`.{${COLS}}`, "g");
-        let withNewlines = rez.replace(reg, "$&\n");
-        grid.innerText = withNewlines
-
-      } //end buildGrid
+  }//end for each pixel
+  
+  let reg = new RegExp(`.{${COLS}}`, "g");
+  let withNewlines = rez.replace(reg,"$&\n");
+  grid.innerText = withNewlines
+  
+}//end buildGrid
     </script>
 
-  </body>
+  
+</body>
 
 </html>
+ 
