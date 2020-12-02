@@ -12,4 +12,4 @@ The character map goes from Dark to Light, which is to say, the leftmost charact
 
 You can use the space character anywhere you want...empty space.
 
-The number of brightness levels is determined by the number of characters in the map, so you could use a simple map of two chars (_$) or a longer map with lots of chars (__supercalifragilisticexpialidocious__).   The only limit is your imagination, but you'll have better luck with 'common' letters, numbers, and punctuation - other, more esoteric symbols tend not be equal width.
+The number of brightness levels is determined by the number of characters in the map, so you could use a simple map of two chars `_$` or a longer map with lots of chars `_supercalifragilisticexpialidocious_`.   The only limit is your imagination, but you'll have better luck with 'common' letters, numbers, and punctuation - other, more esoteric symbols tend not be equal width.
