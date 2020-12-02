@@ -121,7 +121,7 @@ function buildGrid(img) {
   grid.style.fontSize = Math.floor(parseInt(scale.value))+"px"
 
   let rez = ""
-  let map = inputString.value;
+  let map = inputString.value.replace(/\s/g,"⠀")/*U+2800 invis Braille char works better than regular spaces on the web. (which is crazy, but it seems well supported, YMMV. todo:figure this out)*/
   for (let i = 0; i < ROWS * COLS; i++) {
 
     let row = Math.floor(i / COLS);
