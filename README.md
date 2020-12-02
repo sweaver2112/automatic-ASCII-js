@@ -14,4 +14,4 @@ You can use spaces for 'empty' brightness levels as well (YMMV, the actual chara
 
 For a purely monospace result, stick to underscores_  instead of spaces.
 
-The number of brightness levels is determined by the number of characters in the map, so you could use a simple map of two chars (_$) or a longer map with lots of chars (_supercalifragilistic_).   The only limit is your imagination, but you'll have better luck with 'common' letters, numbers, and punctuation - other, more esoteric symbols tend not be equal width.
+The number of brightness levels is determined by the number of characters in the map, so you could use a simple map of two chars (_$) or a longer map with lots of chars (__supercalifragilisticexpialidocious__).   The only limit is your imagination, but you'll have better luck with 'common' letters, numbers, and punctuation - other, more esoteric symbols tend not be equal width.
